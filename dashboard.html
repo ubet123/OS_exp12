@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Monitor | System Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.25);
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .header-text h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-text p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .last-update {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.processes { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .stat-icon.alerts { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .stat-icon.memory { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+        .stat-icon.peak { background: rgba(245, 158, 11, 0.1); color: var(--accent); }
+
+        .stat-info {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .trend-up { color: var(--secondary); }
+        .trend-down { color: var(--danger); }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Process List */
+        .process-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .process-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .process-item {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+
+        .process-item:last-child {
+            border-bottom: none;
+        }
+
+        .process-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .process-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .process-info {
+            flex: 1;
+        }
+
+        .process-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .process-details {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .process-memory {
+            text-align: right;
+        }
+
+        .memory-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .memory-percent {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .alert-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .warning-badge {
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        /* Loading states */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.75rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .section-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-memory"></i>
+                </div>
+                <div class="header-text">
+                    <h1>System Memory Analytics</h1>
+                    <p>Real-time process monitoring and visualization</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="last-update" id="lastUpdate">
+                    <i class="fas fa-clock"></i>
+                    <span>Updated: Just now</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon processes">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalProcesses">0</div>
+                        <div class="stat-label">Active Processes</div>
+                    </div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="processTrend">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon alerts">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="alertsCount">0</div>
+                        <div class="stat-label">Active Alerts</div>
+                    </div>
+                    <div class="stat-trend trend-down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="alertTrend">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon memory">
+                        <i class="fas fa-memory"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="avgMemory">0%</div>
+                        <div class="stat-label">Avg Memory Usage</div>
+                    </div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="memoryTrend">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon peak">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="topMemory">0%</div>
+                        <div class="stat-label">Peak Usage</div>
+                    </div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="peakTrend">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Memory Usage Timeline</div>
+                    <div class="chart-actions">
+                        <button class="btn btn-secondary" onclick="exportChartData()">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="memoryChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Alert Distribution</div>
+                    <div class="chart-actions">
+                        <!-- <button class="btn btn-secondary" onclick="toggleChartView()">
+                            <i class="fas fa-filter"></i>
+                            Toggle View
+                        </button> -->
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="alertChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process List -->
+        <div class="process-section">
+            <div class="section-header">
+                <div class="section-title">Top Memory Processes</div>
+                <div class="section-actions">
+                    <button class="btn btn-secondary" onclick="loadData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="exportData()">
+                        <i class="fas fa-file-export"></i>
+                        Export Data
+                    </button>
+                </div>
+            </div>
+            <div class="process-list" id="processList">
+                <div class="loading">Loading process data...</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Memory Monitor v2.0 • Real-time System Analytics
+        </div>
+    </div>
+
+    <script>
+    // Chart instances and data
+    let memoryChart, alertChart;
+    let currentData = [];
+    let previousData = [];
+    let alertChartType = 'doughnut';
+
+    // Initialize charts with dark theme
+    function initializeCharts() {
+        const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+        const alertCtx = document.getElementById('alertChart').getContext('2d');
+
+        // Chart.js global configuration for dark theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = '#334155';
+
+        memoryChart = new Chart(memoryCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Memory Usage',
+                    data: [],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#0f172a',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#94a3b8',
+                        borderColor: '#334155',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(51, 65, 85, 0.3)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(51, 65, 85, 0.3)'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'nearest'
+                }
+            }
+        });
+
+        alertChart = new Chart(alertCtx, {
+            type: alertChartType,
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#6366f1',
+                        '#10b981',
+                        '#f59e0b',
+                        '#64748b',
+                        '#8b5cf6',
+                        '#ec4899'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: alertChartType === 'doughnut' ? '75%' : '0%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#94a3b8'
+                    }
+                }
+            }
+        });
+    }
+
+    // Load and process data
+    async function loadData() {
+        try {
+            // Show loading state
+            document.getElementById('processList').innerHTML = '<div class="loading">Loading process data...</div>';
+            
+            // Store previous data for trend calculations
+            if (currentData.length > 0) {
+                previousData = [...currentData];
+            }
+            
+            // Fetch from your JSON file
+            const response = await fetch('memory_alerts.json');
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            
+            currentData = await response.json();
+            
+            // Process the data
+            processData(currentData);
+            updateLastUpdate();
+            
+        } catch (error) {
+            console.error('Error loading data:', error);
+            document.getElementById('processList').innerHTML = 
+                '<div class="loading">Error loading data. Make sure memory_alerts.json is in the same directory.</div>';
+        }
+    }
+
+    // Process and display data
+    function processData(data) {
+        if (!data || data.length === 0) {
+            document.getElementById('processList').innerHTML = 
+                '<div class="loading">No process data available</div>';
+            return;
+        }
+
+        // Calculate statistics
+        const totalProcesses = data.length;
+        const alertsCount = data.filter(p => p.memory_usage_percent > 5).length;
+        const avgMemory = data.reduce((sum, p) => sum + p.memory_usage_percent, 0) / data.length;
+        const topMemory = Math.max(...data.map(p => p.memory_usage_percent));
+
+        // Calculate trends
+        const prevTotalProcesses = previousData.length || totalProcesses;
+        const prevAlertsCount = previousData.filter(p => p.memory_usage_percent > 5).length || alertsCount;
+        const prevAvgMemory = previousData.length > 0 ? 
+            previousData.reduce((sum, p) => sum + p.memory_usage_percent, 0) / previousData.length : avgMemory;
+        const prevTopMemory = previousData.length > 0 ? 
+            Math.max(...previousData.map(p => p.memory_usage_percent)) : topMemory;
+
+        // Update stats
+        document.getElementById('totalProcesses').textContent = totalProcesses;
+        document.getElementById('alertsCount').textContent = alertsCount;
+        document.getElementById('avgMemory').textContent = avgMemory.toFixed(1) + '%';
+        document.getElementById('topMemory').textContent = topMemory.toFixed(1) + '%';
+
+        // Update trends
+        document.getElementById('processTrend').textContent = 
+            calculateTrendPercentage(totalProcesses, prevTotalProcesses) + '%';
+        document.getElementById('alertTrend').textContent = 
+            calculateTrendPercentage(alertsCount, prevAlertsCount) + '%';
+        document.getElementById('memoryTrend').textContent = 
+            calculateTrendPercentage(avgMemory, prevAvgMemory) + '%';
+        document.getElementById('peakTrend').textContent = 
+            calculateTrendPercentage(topMemory, prevTopMemory) + '%';
+
+        // Update process list
+        const sortedData = data.sort((a, b) => b.memory_usage_percent - a.memory_usage_percent);
+        const topProcesses = sortedData.slice(0, 8);
+
+        const processList = document.getElementById('processList');
+        processList.innerHTML = topProcesses.map(process => {
+            const badge = process.memory_usage_percent > 8 ? 'alert-badge' : 
+                         process.memory_usage_percent > 5 ? 'warning-badge' : '';
+            const badgeText = process.memory_usage_percent > 8 ? 'CRITICAL' : 
+                            process.memory_usage_percent > 5 ? 'WARNING' : '';
+            
+            return `
+                <div class="process-item">
+                    <div class="process-icon" style="background: ${getProcessColor(process.process_name)}">
+                        ${getProcessIcon(process.process_name)}
+                    </div>
+                    <div class="process-info">
+                        <div class="process-name">
+                            ${process.process_name || 'Unknown Process'}
+                            ${badge ? `<span class="${badge}">${badgeText}</span>` : ''}
+                        </div>
+                        <div class="process-details">
+                            PID: ${process.pid} • ${new Date(process.timestamp).toLocaleTimeString()}
+                        </div>
+                    </div>
+                    <div class="process-memory">
+                        <div class="memory-value">${process.memory_usage_percent.toFixed(1)}%</div>
+                        <div class="memory-percent">${(process.memory_usage_mb || 0).toFixed(1)} MB</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Update charts
+        updateCharts(data);
+    }
+
+    // Calculate trend percentage
+    function calculateTrendPercentage(current, previous) {
+        if (previous === 0) return 0;
+        const change = ((current - previous) / previous) * 100;
+        return Math.abs(change).toFixed(1);
+    }
+
+    // Helper functions for process styling
+    function getProcessColor(processName) {
+        const colors = {
+            'chrome': 'rgba(99, 102, 241, 0.2)',
+            'code': 'rgba(16, 185, 129, 0.2)',
+            'svchost': 'rgba(245, 158, 11, 0.2)',
+            'msedge': 'rgba(59, 130, 246, 0.2)',
+            'explorer': 'rgba(139, 92, 246, 0.2)',
+            'default': 'rgba(100, 116, 139, 0.2)'
+        };
+        
+        if (processName?.includes('chrome')) return colors.chrome;
+        if (processName?.includes('Code')) return colors.code;
+        if (processName?.includes('svchost')) return colors.svchost;
+        if (processName?.includes('msedge')) return colors.msedge;
+        if (processName?.includes('explorer')) return colors.explorer;
+        return colors.default;
+    }
+
+    function getProcessIcon(processName) {
+        const icons = {
+            'chrome': '🌐',
+            'code': '⚡',
+            'svchost': '🔧',
+            'msedge': '🌍',
+            'explorer': '📁',
+            'default': '📄'
+        };
+        
+        if (processName?.includes('chrome')) return icons.chrome;
+        if (processName?.includes('Code')) return icons.code;
+        if (processName?.includes('svchost')) return icons.svchost;
+        if (processName?.includes('msedge')) return icons.msedge;
+        if (processName?.includes('explorer')) return icons.explorer;
+        return icons.default;
+    }
+
+    // Update charts with new data
+    function updateCharts(data) {
+        // Memory timeline (last 10 data points)
+        const recentData = data.slice(-10);
+        memoryChart.data.labels = recentData.map(p => 
+            new Date(p.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        );
+        memoryChart.data.datasets[0].data = recentData.map(p => p.memory_usage_percent);
+        memoryChart.update();
+
+        // Alert distribution - group by process type
+        const processGroups = {};
+        data.forEach(process => {
+            let group = 'Others';
+            
+            if (process.process_name?.includes('chrome')) group = 'Chrome';
+            else if (process.process_name?.includes('Code')) group = 'VS Code';
+            else if (process.process_name?.includes('svchost')) group = 'System Services';
+            else if (process.process_name?.includes('msedge')) group = 'Edge';
+            else if (process.process_name?.includes('explorer')) group = 'Explorer';
+            else if (process.process_name?.includes('MpEng')) group = 'Security';
+            else if (process.process_name?.includes('OmenCommandCenter')) group = 'Omen';
+            else if (process.process_name?.includes('MemCompression')) group = 'Compressor';
+            
+            processGroups[group] = (processGroups[group] || 0) + 1;
+        });
+
+        // Sort by count and take top 6
+        const sortedGroups = Object.entries(processGroups)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 6);
+
+        alertChart.data.labels = sortedGroups.map(g => g[0]);
+        alertChart.data.datasets[0].data = sortedGroups.map(g => g[1]);
+        alertChart.update();
+    }
+
+    // Toggle chart view
+    function toggleChartView() {
+        alertChartType = alertChartType === 'doughnut' ? 'pie' : 'doughnut';
+        alertChart.destroy();
+        initializeCharts();
+        if (currentData.length > 0) {
+            updateCharts(currentData);
+        }
+    }
+
+    // Update last update time
+    function updateLastUpdate() {
+        const now = new Date();
+        document.getElementById('lastUpdate').innerHTML = 
+            `<i class="fas fa-clock"></i> Updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}`;
+    }
+
+    // Export data
+    function exportData() {
+        if (currentData.length === 0) {
+            alert('No data available to export');
+            return;
+        }
+        
+        const dataStr = JSON.stringify(currentData, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `memory_monitor_export_${new Date().getTime()}.json`;
+        link.click();
+    }
+
+    // Export chart data
+    function exportChartData() {
+        if (currentData.length === 0) {
+            alert('No chart data available to export');
+            return;
+        }
+        
+        const chartData = {
+            memoryTimeline: memoryChart.data,
+            alertDistribution: alertChart.data,
+            exportTime: new Date().toISOString()
+        };
+        
+        const dataStr = JSON.stringify(chartData, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `chart_data_export_${new Date().getTime()}.json`;
+        link.click();
+    }
+
+    // Auto-refresh
+    function startAutoRefresh() {
+        setInterval(loadData, 10000); // Refresh every 10 seconds
+    }
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        loadData();
+        startAutoRefresh();
+    });
+</script>
+</body>
+</html>

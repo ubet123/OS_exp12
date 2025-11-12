@@ -1,0 +1,40 @@
+# Process Memory Tracker - Requirements
+# Core monitoring library
+psutil==5.9.5
+
+# Desktop notifications (Windows)
+plyer==2.1.0
+
+# Alternative notifications (Windows)
+win10toast==0.9
+
+# Web framework for potential web dashboard
+flask==2.3.3
+
+# Data analysis and processing
+pandas==2.0.3
+numpy==1.24.3
+
+# Data visualization (for enhanced charts)
+matplotlib==3.7.2
+
+# JSON data handling
+ujson==5.8.0
+
+# Date/Time handling
+python-dateutil==2.8.2
+
+# Configuration management
+pyyaml==6.0
+
+# Logging utilities
+colorlog==6.7.0
+
+# Testing framework
+pytest==7.4.0
+
+# Code quality
+flake8==6.0.0
+
+# Development utilities
+black==23.3.0
