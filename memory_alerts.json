@@ -1,0 +1,226 @@
+[
+  {
+    "timestamp": "2025-11-12T21:49:09.712144",
+    "process_name": "OmenCommandCenterBackground.exe",
+    "pid": 2600,
+    "memory_usage_percent": 2.27526144261875,
+    "memory_usage_mb": 355.1796875,
+    "message": "Process OmenCommandCenterBackground.exe (PID: 2600) using 2.28% memory (355.2 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.712436",
+    "process_name": "MemCompression",
+    "pid": 3540,
+    "memory_usage_percent": 2.1589785320777684,
+    "memory_usage_mb": 337.02734375,
+    "message": "Process MemCompression (PID: 3540) using 2.16% memory (337.0 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.712644",
+    "process_name": "chrome.exe",
+    "pid": 73996,
+    "memory_usage_percent": 8.846684723423337,
+    "memory_usage_mb": 1381.01171875,
+    "message": "Process chrome.exe (PID: 73996) using 8.85% memory (1381.0 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.712782",
+    "process_name": "chrome.exe",
+    "pid": 84516,
+    "memory_usage_percent": 2.6939249623650747,
+    "memory_usage_mb": 420.53515625,
+    "message": "Process chrome.exe (PID: 84516) using 2.69% memory (420.5 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.712912",
+    "process_name": "Code.exe",
+    "pid": 88980,
+    "memory_usage_percent": 2.3242318871913135,
+    "memory_usage_mb": 362.82421875,
+    "message": "Process Code.exe (PID: 88980) using 2.32% memory (362.8 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.713036",
+    "process_name": "Code.exe",
+    "pid": 90212,
+    "memory_usage_percent": 5.117774294545338,
+    "memory_usage_mb": 798.91015625,
+    "message": "Process Code.exe (PID: 90212) using 5.12% memory (798.9 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.713146",
+    "process_name": "chrome.exe",
+    "pid": 90752,
+    "memory_usage_percent": 2.0024582812850324,
+    "memory_usage_mb": 312.59375,
+    "message": "Process chrome.exe (PID: 90752) using 2.00% memory (312.6 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.713410",
+    "process_name": "chrome.exe",
+    "pid": 90912,
+    "memory_usage_percent": 6.303549694116139,
+    "memory_usage_mb": 984.015625,
+    "message": "Process chrome.exe (PID: 90912) using 6.30% memory (984.0 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.714409",
+    "process_name": "Code.exe",
+    "pid": 96732,
+    "memory_usage_percent": 2.2295440168476346,
+    "memory_usage_mb": 348.04296875,
+    "message": "Process Code.exe (PID: 96732) using 2.23% memory (348.0 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:09.714706",
+    "process_name": "chrome.exe",
+    "pid": 97844,
+    "memory_usage_percent": 2.777852847442426,
+    "memory_usage_mb": 433.63671875,
+    "message": "Process chrome.exe (PID: 97844) using 2.78% memory (433.6 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.618381",
+    "process_name": "OmenCommandCenterBackground.exe",
+    "pid": 2600,
+    "memory_usage_percent": 2.2735848867749273,
+    "memory_usage_mb": 354.91796875,
+    "message": "Process OmenCommandCenterBackground.exe (PID: 2600) using 2.27% memory (354.9 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.618718",
+    "process_name": "MemCompression",
+    "pid": 3540,
+    "memory_usage_percent": 2.1453158531116876,
+    "memory_usage_mb": 334.89453125,
+    "message": "Process MemCompression (PID: 3540) using 2.15% memory (334.9 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.618936",
+    "process_name": "chrome.exe",
+    "pid": 73996,
+    "memory_usage_percent": 8.661287674962365,
+    "memory_usage_mb": 1352.0703125,
+    "message": "Process chrome.exe (PID: 73996) using 8.66% memory (1352.1 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.619031",
+    "process_name": "chrome.exe",
+    "pid": 84516,
+    "memory_usage_percent": 2.6667747669837607,
+    "memory_usage_mb": 416.296875,
+    "message": "Process chrome.exe (PID: 84516) using 2.67% memory (416.3 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.619100",
+    "process_name": "Code.exe",
+    "pid": 88980,
+    "memory_usage_percent": 2.3242318871913135,
+    "memory_usage_mb": 362.82421875,
+    "message": "Process Code.exe (PID: 88980) using 2.32% memory (362.8 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.619166",
+    "process_name": "Code.exe",
+    "pid": 90212,
+    "memory_usage_percent": 4.582502562377886,
+    "memory_usage_mb": 715.3515625,
+    "message": "Process Code.exe (PID: 90212) using 4.58% memory (715.4 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.619228",
+    "process_name": "chrome.exe",
+    "pid": 90912,
+    "memory_usage_percent": 6.304900948079818,
+    "memory_usage_mb": 984.2265625,
+    "message": "Process chrome.exe (PID: 90912) using 6.30% memory (984.2 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.619294",
+    "process_name": "Code.exe",
+    "pid": 96732,
+    "memory_usage_percent": 2.2373762851926586,
+    "memory_usage_mb": 349.265625,
+    "message": "Process Code.exe (PID: 96732) using 2.24% memory (349.3 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:49:44.619357",
+    "process_name": "chrome.exe",
+    "pid": 97844,
+    "memory_usage_percent": 2.8037018353031615,
+    "memory_usage_mb": 437.671875,
+    "message": "Process chrome.exe (PID: 97844) using 2.80% memory (437.7 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.074218",
+    "process_name": "OmenCommandCenterBackground.exe",
+    "pid": 2600,
+    "memory_usage_percent": 2.2740603279843694,
+    "memory_usage_mb": 354.9921875,
+    "message": "Process OmenCommandCenterBackground.exe (PID: 2600) using 2.27% memory (355.0 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.074438",
+    "process_name": "MemCompression",
+    "pid": 3540,
+    "memory_usage_percent": 2.121443699753371,
+    "memory_usage_mb": 331.16796875,
+    "message": "Process MemCompression (PID: 3540) using 2.12% memory (331.2 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.074571",
+    "process_name": "chrome.exe",
+    "pid": 73996,
+    "memory_usage_percent": 8.672523101438134,
+    "memory_usage_mb": 1353.82421875,
+    "message": "Process chrome.exe (PID: 73996) using 8.67% memory (1353.8 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.076263",
+    "process_name": "chrome.exe",
+    "pid": 84516,
+    "memory_usage_percent": 2.60271531981679,
+    "memory_usage_mb": 406.296875,
+    "message": "Process chrome.exe (PID: 84516) using 2.60% memory (406.3 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.077030",
+    "process_name": "Code.exe",
+    "pid": 88980,
+    "memory_usage_percent": 2.3246823051792065,
+    "memory_usage_mb": 362.89453125,
+    "message": "Process Code.exe (PID: 88980) using 2.32% memory (362.9 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.079171",
+    "process_name": "Code.exe",
+    "pid": 90212,
+    "memory_usage_percent": 4.608902061112712,
+    "memory_usage_mb": 719.47265625,
+    "message": "Process Code.exe (PID: 90212) using 4.61% memory (719.5 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.079938",
+    "process_name": "chrome.exe",
+    "pid": 90912,
+    "memory_usage_percent": 6.305101133852214,
+    "memory_usage_mb": 984.2578125,
+    "message": "Process chrome.exe (PID: 90912) using 6.31% memory (984.3 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.082530",
+    "process_name": "Code.exe",
+    "pid": 96732,
+    "memory_usage_percent": 2.22919369174594,
+    "memory_usage_mb": 347.98828125,
+    "message": "Process Code.exe (PID: 96732) using 2.23% memory (348.0 MB)"
+  },
+  {
+    "timestamp": "2025-11-12T21:50:20.085408",
+    "process_name": "chrome.exe",
+    "pid": 97844,
+    "memory_usage_percent": 2.5392314067454596,
+    "memory_usage_mb": 396.38671875,
+    "message": "Process chrome.exe (PID: 97844) using 2.54% memory (396.4 MB)"
+  }
+]

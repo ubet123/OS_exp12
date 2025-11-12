@@ -4,23 +4,42 @@ import json
 from datetime import datetime
 from win10toast import ToastNotifier
 import winsound
+import threading
 
 class AdvancedProcessMonitor:
     def __init__(self, alert_threshold=5, check_interval=5, cooldown_period=30):
         self.alert_threshold = alert_threshold
         self.check_interval = check_interval
-        self.cooldown_period = cooldown_period  # Don't alert for same process within 30 seconds
+        self.cooldown_period = cooldown_period
         self.alerts_log = []
-        self.alerted_processes = {}  # {process_key: last_alert_time}
+        self.alerted_processes = {}
         self.toaster = ToastNotifier()
+        self.notification_queue = []
+        self.is_showing_notification = False
         
     def show_notification(self, title, message, duration=5):
-        """Show Windows toast notification with sound"""
+        """Show Windows toast notification with sound - with queue support"""
         try:
-            # Play alert sound
+            # Play alert sound immediately
             winsound.Beep(1000, 300)
             
-            # Show notification
+            # Add to queue and process
+            self.notification_queue.append((title, message, duration))
+            self.process_notification_queue()
+            
+        except Exception as e:
+            print(f"Notification failed: {e}")
+    
+    def process_notification_queue(self):
+        """Process notifications one by one with delays"""
+        if self.is_showing_notification or not self.notification_queue:
+            return
+            
+        self.is_showing_notification = True
+        title, message, duration = self.notification_queue.pop(0)
+        
+        try:
+            # Show the notification
             self.toaster.show_toast(
                 title,
                 message,
@@ -28,7 +47,47 @@ class AdvancedProcessMonitor:
                 threaded=True
             )
         except Exception as e:
-            print(f"Notification failed: {e}")
+            print(f"Notification display failed: {e}")
+        
+        # Schedule next notification after a delay
+        threading.Timer(duration + 1, self.notification_completed).start()
+    
+    def notification_completed(self):
+        """Callback when notification is done"""
+        self.is_showing_notification = False
+        self.process_notification_queue()
+    
+    def show_consolidated_notification(self, alerts):
+        """Show a single consolidated notification for multiple alerts"""
+        if not alerts:
+            return
+            
+        try:
+            winsound.Beep(1000, 300)
+            
+            if len(alerts) == 1:
+                # Single alert - show detailed notification
+                alert = alerts[0]
+                title = "🚨 High Memory Usage!"
+                message = f"{alert['process_name']}\nUsing {alert['memory_usage_percent']:.1f}% RAM\n({alert['memory_usage_mb']:.0f} MB)"
+            else:
+                # Multiple alerts - show consolidated notification
+                title = f"🚨 {len(alerts)} Processes High Memory!"
+                message = f"Top offenders:\n"
+                for alert in alerts[:3]:  # Show top 3 in notification
+                    message += f"• {alert['process_name']}: {alert['memory_usage_percent']:.1f}%\n"
+                if len(alerts) > 3:
+                    message += f"• ... and {len(alerts) - 3} more"
+            
+            self.toaster.show_toast(
+                title,
+                message,
+                duration=7,  # Longer duration for multiple alerts
+                threaded=True
+            )
+            
+        except Exception as e:
+            print(f"Consolidated notification failed: {e}")
     
     def should_alert(self, process_key):
         """Check if we should alert for this process (cooldown period)"""
@@ -54,6 +113,7 @@ class AdvancedProcessMonitor:
         """Check if any process exceeds memory threshold"""
         alerts = []
         total_memory = psutil.virtual_memory()
+        current_alerts = []
         
         for proc in processes:
             memory_usage = proc['memory_percent'] or 0
@@ -65,21 +125,22 @@ class AdvancedProcessMonitor:
                     memory_mb = (proc['memory_info'].rss / 1024 / 1024) if proc['memory_info'] else 0
                     
                     alert_msg = f"Process {proc['name']} (PID: {proc['pid']}) using {memory_usage:.2f}% memory ({memory_mb:.1f} MB)"
-                    alerts.append({
+                    alert_data = {
                         'timestamp': datetime.now().isoformat(),
                         'process_name': proc['name'],
                         'pid': proc['pid'],
                         'memory_usage_percent': memory_usage,
                         'memory_usage_mb': memory_mb,
                         'message': alert_msg
-                    })
-                    
-                    # Show desktop notification
-                    notification_title = "🚨 High Memory Usage!"
-                    notification_msg = f"{proc['name']}\nUsing {memory_usage:.1f}% RAM\n({memory_mb:.0f} MB)"
-                    self.show_notification(notification_title, notification_msg)
+                    }
+                    alerts.append(alert_data)
+                    current_alerts.append(alert_data)
                     
                     print(f"🚨 {alert_msg}")
+        
+        # Show consolidated notification for all current alerts
+        if current_alerts:
+            self.show_consolidated_notification(current_alerts)
         
         # Alert for total system memory
         if total_memory.percent > 85:
@@ -159,7 +220,7 @@ class AdvancedProcessMonitor:
 if __name__ == "__main__":
     monitor = AdvancedProcessMonitor(
         alert_threshold=2.0,      # Alert if process uses >2% of total RAM
-        check_interval=10,       # Check every 10 seconds
+        check_interval=5,       # Check every 5 seconds
         cooldown_period=30      # Don't spam alerts for same process within 30 seconds
     )
     monitor.run_monitor(duration=300)  # Run for 5 minutes
